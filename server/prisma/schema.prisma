@@ -1,0 +1,85 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String @id @default(uuid())
+  email        String @unique
+  passwordHash String
+  role         String @default("ADMIN")
+}
+
+model Team {
+  id           String   @id @default(uuid())
+  name         String
+  logoUrl      String?
+  status       String   @default("INTERESTED")
+  depositPaid  Boolean  @default(false)
+  fullFeePaid  Boolean  @default(false)
+  zelleMemoRef String?
+  createdAt    DateTime @default(now())
+  captain      Captain?
+  players      Player[]
+  standing     Standing?
+}
+
+model Captain {
+  id           String  @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String  @unique
+  phone        String
+  teamId       String  @unique
+  team         Team    @relation(fields: [teamId], references: [id])
+  waiverSigned Boolean @default(false)
+}
+
+model Player {
+  id           String  @id @default(uuid())
+  firstName    String
+  lastName     String
+  jerseyNumber Int?
+  teamId       String
+  team         Team    @relation(fields: [teamId], references: [id])
+  waiverSigned Boolean @default(false)
+}
+
+model Match {
+  id         String   @id @default(uuid())
+  homeTeamId String
+  awayTeamId String
+  homeScore  Int?
+  awayScore  Int?
+  date       DateTime
+  time       String
+  venue      String
+  week       Int?
+  phase      String   @default("LEAGUE")
+  status     String   @default("SCHEDULED")
+}
+
+model Standing {
+  id           String @id @default(uuid())
+  teamId       String @unique
+  team         Team   @relation(fields: [teamId], references: [id])
+  played       Int    @default(0)
+  won          Int    @default(0)
+  drawn        Int    @default(0)
+  lost         Int    @default(0)
+  goalsFor     Int    @default(0)
+  goalsAgainst Int    @default(0)
+  points       Int    @default(0)
+}
+
+model Rule {
+  id       String @id @default(uuid())
+  section  String
+  title    String
+  content  String
+  sortOrder Int   @default(0)
+}
