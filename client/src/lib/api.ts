@@ -1,4 +1,4 @@
-const BASE = '/api';
+const BASE = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : '/api';
 
 async function request(path: string, options?: RequestInit) {
   const token = localStorage.getItem('msl7s_token');
